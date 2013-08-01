@@ -95,9 +95,19 @@ int main(int argc, char** argv)
         printf("Invalid SEQ file format!\n");
         return -1;
     }
+    int* hs = (int*)malloc(sizeof(int) * obCount);
+    printf("SEQ: ");
+    for (int i = 0; i < obCount; i++)
+        printf("%d(%s) ", ob[i], hmm->ObservationalState[ob[i]]);
+    printf("\n");
 
     printf("Forward: %.8lf\n", hmm->Forward(obCount, ob));
     printf("Backward: %.8lf\n", hmm->Backward(obCount, ob));
+    hmm->Viterbi(obCount, ob, hs);
+    printf("Viterbi: ");
+    for (int i = 0; i < obCount; i++)
+        printf("%d(%s) ", hs[i], hmm->hiddenState[hs[i]]);
+    printf("\n");
 
     return 0;
 }
