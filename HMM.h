@@ -4,8 +4,6 @@
 class HMM
 {
 private:
-    enum X {XLW, AXL, LCS};
-    enum O {Laugh, Sad, Cry, Angry};
 
     double* Pi;
     double** A;
@@ -20,6 +18,10 @@ public:
 
     double Forward(int obCount, int* ob);
     double Backward(int obCount, int* ob);
+    void Viterbi(int obCount, int* ob, int* hs);
+
+    char** hiddenState;
+    char** ObservationalState;
 };
 
 #endif // HMM_H_INCLUDED
