@@ -1,4 +1,5 @@
 #include "HMM.h"
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -26,30 +27,21 @@ HMM::HMM(int _N, int _M, double* _Pi, double** _A, double** _B)
         for (int j = 0; j < M; j++)
             *(*(B + i) + j) = *(*(_B + i) + j);
     }
-    printf("N = %d M = %d\n\n", N, M);
 
-    printf("Pi:\n");
+    hiddenState = (char**)malloc(sizeof(char*) * N);
     for (int i = 0; i < N; i++)
-        printf("%.4lf\n", Pi[i]);
-    printf("\n");
+        hiddenState[i] = (char*)malloc(sizeof(char) * 100);
+    strcpy(hiddenState[0], "AsuraKing");
+    strcpy(hiddenState[1], "Asura");
+    strcpy(hiddenState[2], "Rasetsu");
 
-    printf("A:\n");
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-            printf("%.4lf ", A[i][j]);
-        printf("\n");
-    }
-    printf("\n");
-
-    printf("B:\n");
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < M; j++)
-            printf("%.4lf ", B[i][j]);
-        printf("\n");
-    }
-    printf("\n");
+    ObservationalState = (char**)malloc(sizeof(char*) * M);
+    for (int i = 0; i < M; i++)
+        ObservationalState[i] = (char*)malloc(sizeof(char) * 100);
+    strcpy(ObservationalState[0], "Laugh");
+    strcpy(ObservationalState[1], "Sad");
+    strcpy(ObservationalState[2], "Cry");
+    strcpy(ObservationalState[3], "Angry");
 }
 
 double HMM::Forward(int obCount, int* ob)
@@ -60,10 +52,7 @@ double HMM::Forward(int obCount, int* ob)
         *(Alpha + i) = (double*)malloc(sizeof(double) * N);
 
     for (int j = 0; j < N; j++)
-    {
         Alpha[0][j] = Pi[j] * B[j][ob[0]];
-        printf("Alpha[%d][%d] = %.8lf\n", 0, j, Alpha[0][j]);
-    }
 
     for (int i = 1; i < obCount; i++)
     {
@@ -89,10 +78,7 @@ double HMM::Backward(int obCount, int* ob)
         *(Beta + i) = (double*)malloc(sizeof(double) * N);
 
     for (int j = 0; j < N; j++)
-    {
         Beta[obCount - 1][j] = 1;
-        printf("Beta[%d][%d] = %.8lf\n", obCount - 1, j, Beta[obCount - 1][j]);
-    }
 
     for (int i = obCount - 2; i >= 0; i--)
     {
@@ -102,11 +88,52 @@ double HMM::Backward(int obCount, int* ob)
             for (int k = 0; k < N; k++)
                 Beta[i][j] += Beta[i + 1][k] * A[j][k] * B[k][ob[i + 1]];
 
-            printf("Beta[%d][%d] = %.8lf\n", i, j, Beta[i][j]);
-
             if (i == 0)
                 ans += Beta[i][j];
         }
     }
     return ans;
+}
+
+void HMM::Viterbi(int obCount, int* ob, int* hs)
+{
+    double **x = (double**)malloc(sizeof(double*) * N);
+    for (int i = 0; i < N; i++)
+        *(x + i) = (double*)malloc(sizeof(double) * N);
+
+    double _max = 0.0;
+    int _hsIndex = 0;
+    for (int j = 0; j < N; j++)
+    {
+        x[0][j] = Pi[j] * B[j][ob[0]];
+        if (_max < x[0][j])
+        {
+            _max = x[0][j];
+            _hsIndex = j;
+        }
+    }
+    hs[0] = _hsIndex;
+
+    for (int i = 1; i < obCount; i++)
+    {
+        _max = 0.0;
+        _hsIndex = 0;
+        for (int j = 0; j < N; j++)
+        {
+            double _maxPrevious = 0.0;
+            for (int k = 0; k < N; k++)
+            {
+                double tmp = x[i - 1][k] * A[k][j];
+                _maxPrevious = _maxPrevious > tmp ? _maxPrevious : tmp;
+            }
+            x[i][j] = _maxPrevious * B[j][ob[i]];
+
+            if (_max < x[i][j])
+            {
+                _max = x[i][j];
+                _hsIndex = j;
+            }
+        }
+        hs[i] = _hsIndex;
+    }
 }
