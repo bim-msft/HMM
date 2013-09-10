@@ -23,8 +23,8 @@ HMM::HMM(int _N, int _M, double* _Pi, double** _A, double** _B)
     B = (double**)malloc(sizeof(double*) * N);
     for (int i = 0; i < N; i++)
     {
-        *(B + i) = (double*)malloc(sizeof(double) * 1000);
-        for (int j = 0; j < 1000; j++)
+        *(B + i) = (double*)malloc(sizeof(double) * M);
+        for (int j = 0; j < M; j++)
             *(*(B + i) + j) = *(*(_B + i) + j);
     }
 
