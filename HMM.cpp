@@ -23,8 +23,8 @@ HMM::HMM(int _N, int _M, double* _Pi, double** _A, double** _B)
     B = (double**)malloc(sizeof(double*) * N);
     for (int i = 0; i < N; i++)
     {
-        *(B + i) = (double*)malloc(sizeof(double) * M);
-        for (int j = 0; j < M; j++)
+        *(B + i) = (double*)malloc(sizeof(double) * 1000);
+        for (int j = 0; j < 1000; j++)
             *(*(B + i) + j) = *(*(_B + i) + j);
     }
 
@@ -47,8 +47,8 @@ HMM::HMM(int _N, int _M, double* _Pi, double** _A, double** _B)
 double HMM::Forward(int obCount, int* ob)
 {
     double ans = 0.0;
-    double** Alpha = (double**)malloc(sizeof(double*) * N);
-    for (int i = 0; i < N; i++)
+    double** Alpha = (double**)malloc(sizeof(double*) * obCount);
+    for (int i = 0; i < obCount; i++)
         *(Alpha + i) = (double*)malloc(sizeof(double) * N);
 
     for (int j = 0; j < N; j++)
@@ -73,8 +73,8 @@ double HMM::Forward(int obCount, int* ob)
 double HMM::Backward(int obCount, int* ob)
 {
     double ans = 0.0;
-    double** Beta = (double**)malloc(sizeof(double*) * N);
-    for (int i = 0; i < N; i++)
+    double** Beta = (double**)malloc(sizeof(double*) * obCount);
+    for (int i = 0; i < obCount; i++)
         *(Beta + i) = (double*)malloc(sizeof(double) * N);
 
     for (int j = 0; j < N; j++)
@@ -97,8 +97,8 @@ double HMM::Backward(int obCount, int* ob)
 
 void HMM::Viterbi(int obCount, int* ob, int* hs)
 {
-    double **x = (double**)malloc(sizeof(double*) * N);
-    for (int i = 0; i < N; i++)
+    double **x = (double**)malloc(sizeof(double*) * obCount);
+    for (int i = 0; i < obCount; i++)
         *(x + i) = (double*)malloc(sizeof(double) * N);
 
     double _max = 0.0;
